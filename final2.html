@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title> Playloop - Toy Rental </title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: #f9f9f9;
+      color: #333;
+    }
+    header {
+      background: #ff6f61;
+      color: white;
+      padding: 20px;
+      text-align: center;
+      position: relative;
+    }
+    header h1 { margin: 0; font-size: 2.5em; }
+    header p { font-size: 1.2em; margin-top: 5px; }
+    nav {
+      background: #ff3b2f;
+      padding: 30px;
+      text-align: center;
+    }
+    nav a {
+      text-decoration: none;
+      color: white;
+      margin: 0 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    nav a:hover { text-decoration: underline; }
+
+    /* Cart Icon */
+    .cart-icon {
+      position: absolute;
+      top: 20px;
+      right: 30px;
+      font-size: 24px;
+      color: white;
+      cursor: pointer;
+    }
+    .cart-count {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: white;
+      color: #ff3b2f;
+      border-radius: 50%;
+      width: 20px;
+      height: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 12px;
+      font-weight: bold;
+    }
+
+    /* Hero Section (slideshow) */
+    .hero {
+      height: 350px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .hero .slide {
+      position: absolute;
+      inset: 0;
+      background-size: cover;
+      background-position: center;
+      opacity: 0;
+      transition: opacity 900ms ease-in-out;
+    }
+    .hero .slide.active { opacity: 1; }
+    .hero-text {
+      position: relative;
+      z-index: 2;
+      font-size: 2em;
+      font-weight: bold;
+      background: rgba(0,0,0,0.5);
+      padding: 10px 20px;
+      border-radius: 8px;
+    }
+
+    .section { padding: 40px 20px; text-align: center; }
+    .section h2 { color: #ff3b2f; font-size: 2em; margin-bottom: 20px; }
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 20px;
+      padding: 20px;
+    }
+    .card {
+      background: white;
+      padding: 20px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      transition: transform 0.2s, box-shadow 0.3s;
+      cursor: pointer;
+      position: relative;
+      overflow: hidden;
+    }
+    .card:hover { 
+      transform: scale(1.05); 
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    .card img { 
+      width: 100%; 
+      border-radius: 10px;
+      transition: transform 0.3s ease;
+    }
+    .card:hover img {
+      transform: scale(1.05);
+    }
+    .card h3 { margin: 10px 0; color: #ff3b2f; }
+    
+    /* Card overlay effect */
+    .card-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 59, 47, 0.8);
+      color: white;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      transition: opacity 0.3s ease;
+      border-radius: 15px;
+      padding: 20px;
+      text-align: center;
+    }
+    .card:hover .card-overlay {
+      opacity: 1;
+    }
+    .card-overlay h3 {
+      color: white;
+      margin-bottom: 10px;
+    }
+    .card-overlay p {
+      margin-bottom: 15px;
+    }
+    .card-overlay .btn {
+      background: white;
+      color: #ff3b2f;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 20px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    .card-overlay .btn:hover {
+      background: #f0f0f0;
+    }
+
+    /* Add to cart button */
+    .add-to-cart {
+      background: #ff3b2f;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 10px;
+      font-weight: bold;
+      transition: background 0.3s;
+    }
+    .add-to-cart:hover {
+      background: #e02b20;
+    }
+
+    /* Why Toy Rental Section */
+    .why-rental {
+      background: #fff7f7;
+      padding: 50px 20px;
+    }
+    .why-rental h2 {
+      font-size: 2.2em;
+      color: #ff3b2f;
+      margin-bottom: 30px;
+    }
+    .rental-container {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      align-items: center;
+      gap: 30px;
+      max-width: 1000px;
+      margin: auto;
+    }
+    .rental-text {
+      flex: 1;
+      min-width: 280px;
+      font-size: 1.1em;
+      line-height: 1.6;
+      color: #444;
+      text-align: left;
+    }
+    .rental-image {
+      flex: 1;
+      min-width: 280px;
+    }
+    .rental-image img {
+      width: 100%;
+      border-radius: 15px;
+      box-shadow: 0 6px 15px rgba(0,0,0,0.15);
+    }
+
+    footer {
+      background: #333;
+      color: white;
+      text-align: center;
+      padding: 15px;
+    }
+
+    /* Modal for toy details */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 1000;
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 500px;
+      position: relative;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+      animation: modalFade 0.3s;
+    }
+    @keyframes modalFade {
+      from { opacity: 0; transform: translateY(-50px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .close-modal {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      font-size: 24px;
+      cursor: pointer;
+      color: #888;
+    }
+    .close-modal:hover {
+      color: #ff3b2f;
+    }
+    .modal-image {
+      width: 100%;
+      border-radius: 10px;
+      margin-bottom: 15px;
+    }
+    .modal-title {
+      color: #ff3b2f;
+      margin-bottom: 10px;
+    }
+    .modal-price {
+      font-size: 1.2em;
+      font-weight: bold;
+      color: #ff3b2f;
+      margin-bottom: 15px;
+    }
+    .modal-description {
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+    .modal-btn {
+      background: #ff3b2f;
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 25px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s;
+      margin-right: 10px;
+    }
+    .modal-btn:hover {
+      background: #e02b20;
+    }
+
+    /* Cart Modal */
+    .cart-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 350px;
+      height: 100%;
+      background: white;
+      z-index: 1001;
+      box-shadow: -5px 0 15px rgba(0,0,0,0.1);
+      overflow-y: auto;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+    }
+    .cart-modal.open {
+      transform: translateX(0);
+    }
+    .cart-header {
+      background: #ff3b2f;
+      color: white;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .cart-header h2 {
+      margin: 0;
+    }
+    .close-cart {
+      font-size: 24px;
+      cursor: pointer;
+    }
+    .cart-items {
+      padding: 20px;
+    }
+    .cart-item {
+      display: flex;
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid #eee;
+    }
+    .cart-item img {
+      width: 80px;
+      height: 80px;
+      object-fit: cover;
+      border-radius: 8px;
+      margin-right: 15px;
+    }
+    .cart-item-details {
+      flex-grow: 1;
+    }
+    .cart-item-title {
+      font-weight: bold;
+      margin-bottom: 5px;
+    }
+    .cart-item-price {
+      color: #ff3b2f;
+      font-weight: bold;
+    }
+    .remove-item {
+      color: #888;
+      cursor: pointer;
+      align-self: flex-start;
+    }
+    .remove-item:hover {
+      color: #ff3b2f;
+    }
+    .cart-total {
+      padding: 20px;
+      background: #f9f9f9;
+      border-top: 1px solid #eee;
+      position: sticky;
+      bottom: 0;
+    }
+    .cart-total p {
+      display: flex;
+      justify-content: space-between;
+      font-weight: bold;
+      font-size: 1.2em;
+    }
+    .checkout-btn {
+      background: #ff3b2f;
+      color: white;
+      border: none;
+      padding: 15px;
+      border-radius: 8px;
+      width: 100%;
+      font-weight: bold;
+      cursor: pointer;
+      margin-top: 15px;
+      transition: background 0.3s;
+    }
+    .checkout-btn:hover {
+      background: #e02b20;
+    }
+    .empty-cart {
+      text-align: center;
+      padding: 40px 20px;
+      color: #888;
+    }
+
+    /* Checkout Modal */
+    .checkout-modal {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      z-index: 1002;
+      justify-content: center;
+      align-items: center;
+    }
+    .checkout-content {
+      background: white;
+      padding: 30px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 500px;
+      position: relative;
+      box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+      animation: modalFade 0.3s;
+    }
+    .checkout-form {
+      display: flex;
+      flex-direction: column;
+    }
+    .checkout-form input,
+    .checkout-form select {
+      padding: 12px;
+      margin-bottom: 15px;
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      font-size: 16px;
+    }
+    .form-row {
+      display: flex;
+      gap: 15px;
+    }
+    .form-row > div {
+      flex: 1;
+    }
+
+    /* Animated Login/Signup Form Styles */
+    .auth-container {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      opacity: 0;
+      visibility: hidden;
+      transition: opacity 0.3s, visibility 0.3s;
+    }
+    
+    .auth-container.show {
+      opacity: 1;
+      visibility: visible;
+    }
+    
+    .auth-box {
+      position: relative;
+      width: 800px;
+      max-width: 90%;
+      height: 500px;
+      background: white;
+      border-radius: 15px;
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+      overflow: hidden;
+    }
+    
+    /* --- DEMO Payment styles (added) --- */
+    #payBtn {
+      margin-top: 25px;
+      background: #ff3b2f;
+      color: #fff;
+      border: none;
+      padding: 14px 28px;
+      font-size: 18px;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+    #payBtn:hover { background: #e02b20; }
+
+    .popup {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.5);
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+    .popup-content {
+      background: #fff;
+      padding: 30px;
+      border-radius: 15px;
+      text-align: center;
+      width: 320px;
+      box-shadow: 0px 5px 20px rgba(0,0,0,0.2);
+    }
+    .popup-content h2 {
+      color: green;
+      margin-bottom: 10px;
+    }
+    .close-btn {
+      margin-top: 15px;
+      padding: 8px 18px;
+      background: #ff3b2f;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+    }
+    .close-btn:hover { background: #e02b20; }
+
+    /* small responsive nicety */
+    @media (max-width: 768px) {
+      .auth-box {
+        height: auto;
+        max-height: 90%;
+        overflow-y: auto;
+      }
+      
+      .cart-modal {
+        width: 100%;
+      }
+      
+      .form-row {
+        flex-direction: column;
+        gap: 0;
+      }
+    }
+
+    @media (max-width: 480px) {
+      header h1 { font-size: 1.8em; }
+      .hero { height: 220px; }
+      .cart-icon {
+        right: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Header -->
+  <header>
+    <h1>Playloop</h1>
+    <p>Affordable & Fun Toy Rentals for Kids</p>
+    <div class="cart-icon" onclick="toggleCart()">
+      <i class="fas fa-shopping-cart"></i>
+      <span class="cart-count" id="cartCount">0</span>
+    </div>
+  </header>
+
+  <!-- Navigation -->
+  <nav>
+    <a href="#">Home</a>
+    <a href="#toys">Toys</a>
+    <a href="#plans">Plans</a>
+    <a href="#why">Why Rental?</a>
+    <a href="#about">About</a>
+    <a href="#contact">Contact</a>
+    <a onclick="showAuthForm()">Login</a>
+    <a onclick="showAuthForm(true)">Signup</a>
+  </nav>
+
+  <!-- Hero -->
+  <div class="hero"></div>
+
+  <!-- Toys Section -->
+  <section class="section" id="toys">
+    <h2>Our Toys</h2>
+    <div class="cards" id="toy-list">
+      <!-- Lego Card 1 -->
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1590922739638-1df46745c5a8?q=80" alt="Lego Classic Set">
+        <h3>Lego Classic Set</h3>
+        <p>Creative building blocks.</p>
+        <div class="card-overlay">
+          <h3>Lego Classic Set</h3>
+          <p>Creative building blocks with 500 pieces</p>
+          <button class="btn" onclick="openToyModal('Lego Classic Set', 'https://images.unsplash.com/photo-1590922739638-1df46745c5a8?q=80', '₹799/month', 'This creative building blocks set includes 500 pieces of various colors and shapes. Perfect for children aged 5-12 to develop creativity and motor skills.')">View Details</button>
+        </div>
+      </div>
+
+      <!-- Lego Card 2 -->
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1630029546304-981fdadbb842?q=80" alt="Remote Control Car">
+        <h3>Remote Control Car</h3>
+        <p>High-speed fun.</p>
+        <div class="card-overlay">
+          <h3>Remote Control Car</h3>
+          <p>High-speed remote control car</p>
+          <button class="btn" onclick="openToyModal('Remote Control Car', 'https://images.unsplash.com/photo-1630029546304-981fdadbb842?q=80', '₹599/month', 'High-speed remote control car with realistic features. Easy to control with a range of up to 50 meters. Suitable for kids aged 6 and above.')">View Details</button>
+        </div>
+      </div>
+
+      <!-- Lego Card 3 -->
+      <div class="card">
+        <img src="https://plus.unsplash.com/premium_photo-1682310142169-73db8df07ad7?w=600" alt="Educational Puzzle">
+        <h3>Educational Puzzle</h3>
+        <p>Boosts problem-solving.</p>
+        <div class="card-overlay">
+          <h3>Educational Puzzle</h3>
+          <p>Boosts problem-solving skills</p>
+          <button class="btn" onclick="openToyModal('Educational Puzzle', 'https://plus.unsplash.com/premium_photo-1682310142169-73db8df07ad7?w=600', '₹499/month', 'Educational puzzle that boosts problem-solving skills and cognitive development. Made from safe, non-toxic materials for children aged 4-10.')">View Details</button>
+        </div>
+      </div>
+
+      <!-- Lego Card 4 -->
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1664924520071-f1c1ab17d77f?q=80" alt="Soft Toys">
+        <h3>Soft Toys</h3>
+        <p>Cute & cuddly friends.</p>
+        <div class="card-overlay">
+          <h3>Soft Toys</h3>
+          <p>Cute & cuddly friends</p>
+          <button class="btn" onclick="openToyModal('Soft Toys', 'https://images.unsplash.com/photo-1664924520071-f1c1ab17d77f?q=80', '₹399/month', 'Cute & cuddly friends perfect for young children. Made from hypoallergenic materials and machine washable. Various characters available.')">View Details</button>
+        </div>
+      </div>
+
+      <!-- Lego Card 5 -->
+      <div class="card">
+        <img src="https://images.unsplash.com/photo-1599135027623-7051afeb610d?q=80" alt="Ride On Toys">
+        <h3>Ride On Toys</h3>
+        <p>Fun on wheels for toddlers.</p>
+        <div class="card-overlay">
+          <h3>Ride On Toys</h3>
+          <p>Fun on wheels for toddlers</p>
+          <button class="btn" onclick="openToyModal('Ride On Toys', 'https://images.unsplash.com/photo-1599135027623-7051afeb610d?q=80', '₹1299/month', 'From tiny racers to mini explorers, Ride-on Toys bring joy on wheels. Safe and sturdy designs for indoor and outdoor use. For children 2-5 years.')">View Details</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Toy Modal -->
+  <div class="modal" id="toyModal">
+    <div class="modal-content">
+      <span class="close-modal" onclick="closeModal('toyModal')">&times;</span>
+      <img src="" alt="Toy Image" class="modal-image" id="modalImage">
+      <h2 class="modal-title" id="modalTitle"></h2>
+      <div class="modal-price" id="modalPrice"></div>
+      <p class="modal-description" id="modalDescription"></p>
+      <button class="modal-btn" onclick="addToCart()">Add to Cart</button>
+      <button class="modal-btn" style="background: #888;" onclick="closeModal('toyModal')">Continue Shopping</button>
+    </div>
+  </div>
+
+  <!-- Cart Modal -->
+  <div class="cart-modal" id="cartModal">
+    <div class="cart-header">
+      <h2>Your Cart</h2>
+      <span class="close-cart" onclick="toggleCart()">&times;</span>
+    </div>
+    <div class="cart-items" id="cartItems">
+      <!-- Cart items will be added here dynamically -->
+    </div>
+    <div class="cart-total">
+      <p>Total: <span id="cartTotal">₹0</span></p>
+      <button class="checkout-btn" onclick="openCheckout()">Proceed to Checkout</button>
+    </div>
+  </div>
+
+  <!-- Checkout Modal -->
+  <div class="checkout-modal" id="checkoutModal">
+    <div class="checkout-content">
+      <span class="close-modal" onclick="closeModal('checkoutModal')">&times;</span>
+      <h2>Checkout</h2>
+      <form class="checkout-form" id="checkoutForm">
+        <h3>Personal Information</h3>
+        <input type="text" placeholder="Full Name" required>
+        <input type="email" placeholder="Email" required>
+        <input type="tel" placeholder="Phone Number" required>
+        
+        <h3>Shipping Address</h3>
+        <input type="text" placeholder="Street Address" required>
+        <input type="text" placeholder="City" required>
+        <input type="text" placeholder="Postal Code" required>
+        <input type="text" placeholder="Country" required>
+        
+        <h3>Payment Information</h3>
+        <input type="text" placeholder="Cardholder Name" required>
+        <input type="text" placeholder="Card Number" required>
+        <div class="form-row">
+          <div>
+            <input type="text" placeholder="Expiry Date" required>
+          </div>
+          <div>
+            <input type="text" placeholder="CVV" required>
+          </div>
+        </div>
+        
+        <button type="button" class="checkout-btn" onclick="processPayment()">Complete Payment</button>
+      </form>
+    </div>
+  </div>
+
+  <!-- Plans Section -->
+  <section class="section" id="plans">
+    <h2>Subscription Plans</h2>
+    <div class="cards" id="plan-list"></div>
+
+    <!-- ✅ Demo Payment Button -->
+    <button id="payBtn">Pay Now</button>
+
+    <!-- Popup (Demo Payment Success) -->
+    <div class="popup" id="paymentPopup">
+      <div class="popup-content">
+        <h2>✅ Payment Successful!</h2>
+        <p id="txnIdText">Transaction ID: DEMO123456</p>
+        <button class="close-btn" id="closePopupBtn">Close</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Why Toy Rental -->
+  <section class="section why-rental" id="why">
+    <h2>🌱 Why Toy Rental is Important</h2>
+    <div class="rental-container">
+      <div class="rental-text">
+        <p>
+          Toy rental is not just about fun—it's about being smart and sustainable.  
+          Parents save money by avoiding frequent toy purchases, while kids enjoy new toys every month.  
+          Renting also reduces plastic waste, helping our planet.  
+          With Playloop, playtime becomes affordable, eco-friendly, and exciting!
+        </p>
+        <br><br>
+        <div> 
+            <p> 
+                Every toy you rent saves plastic from landfills. Instead of piling up unused toys, Playloop gives them a longer life—shared, loved, and reused by many kids.
+                 Together, we reduce waste, save money, and make playtime planet-friendly.
+                 Playloop works like a library for toys.
+                 One toy can entertain 10-20 kids instead of ending up as waste after just one child.
+            </p>
+        </div>
+      </div>
+      <div class="rental-image">
+        <img src="why important.jpg" alt="why important">
+        <br><br>
+        <img src="plastic waste.jpg" alt="plastic waste">
+      </div>
+    </div>
+    <br><br><br>
+    <div class="rental-points">
+    <p>♻️<b>Every rented toy saves plastic from landfills and reduces waste.</b> </p>
+    <p>🧸 <b>Toys get a longer life, shared and loved by many kids instead of being thrown away.</b></p>
+    <p>🌍 <b>Fewer new toys produced means less plastic and lower carbon footprint. </b></p>
+    <p>💚 <b> Teach kids sustainability while enjoying fun, safe, and educational toys. </b></p>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="section" id="about">
+    <h2>About Playloop</h2>
+    <p>We make playtime affordable, sustainable, and exciting for kids of all ages. 
+    Our toy rental model reduces waste, saves money, and brings endless joy.</p>
+    <img src="about.jpg" alt="about">
+    <br><br><br><br>
+    <div>
+      <p><b>Playloop is a fun and affordable toy rental platform designed for kids of all ages.
+Instead of spending big on toys that children quickly outgrow, parents can rent high-quality, educational, and entertaining toys for a fraction of the price. From soft toys to STEM kits, remote-control cars to retro games, Playloop has something for every child.
+
+With Playloop, you don't just save money—you also help reduce plastic waste and create a sustainable play culture.</b></p>
+    </div>
+  </section>
+
+  <!-- Contact -->
+  <section class="section" id="contact">
+    <h2>Contact Us</h2>
+    <p>Email: playloop@gmail.com | Phone: +91-7042559439</p>
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 Playloop | All Rights Reserved</p>
+  </footer>
+
+  <!-- Animated Auth Form -->
+  <div class="auth-container" id="authContainer">
+    <div class="auth-box" id="authBox">
+      <span class="close-auth" onclick="hideAuthForm()">&times;</span>
+      
+      <div class="form-panel sign-in-panel">
+        <div class="auth-form">
+          <h2>Sign In</h2>
+          <input type="email" id="loginEmail" placeholder="Email" required>
+          <input type="password" id="loginPassword" placeholder="Password" required>
+          <a href="#" class="auth-link">Forgot your password?</a>
+          <button class="auth-btn" onclick="loginUser()">Sign In</button>
+        </div>
+      </div>
+      
+      <div class="form-panel sign-up-panel">
+        <div class="auth-form">
+          <h2>Create Account</h2>
+          <input type="text" id="signupName" placeholder="Name" required>
+          <input type="email" id="signupEmail" placeholder="Email" required>
+          <input type="password" id="signupPassword" placeholder="Password" required>
+          <button class="auth-btn" onclick="signupUser()">Sign Up</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Cart functionality
+    let cart = [];
+    let currentToy = null;
+
+    // Function to open toy modal
+    function openToyModal(title, image, price, description) {
+      currentToy = { title, image, price, description };
+      document.getElementById('modalTitle').textContent = title;
+      document.getElementById('modalImage').src = image;
+      document.getElementById('modalPrice').textContent = price;
+      document.getElementById('modalDescription').textContent = description;
+      document.getElementById('toyModal').style.display = 'flex';
+    }
+    
+    // Function to add item to cart
+    function addToCart() {
+      if (currentToy) {
+        cart.push(currentToy);
+        updateCart();
+        alert(`${currentToy.title} added to cart!`);
+        closeModal('toyModal');
+      }
+    }
+    
+    // Function to update cart UI
+    function updateCart() {
+      const cartCount = document.getElementById('cartCount');
+      const cartItems = document.getElementById('cartItems');
+      const cartTotal = document.getElementById('cartTotal');
+      
+      // Update cart count
+      cartCount.textContent = cart.length;
+      
+      // Update cart items
+      cartItems.innerHTML = '';
+      if (cart.length === 0) {
+        cartItems.innerHTML = '<div class="empty-cart"><p>Your cart is empty</p></div>';
+      } else {
+        cart.forEach((item, index) => {
+          const price = parseInt(item.price.replace(/[^0-9]/g, ''));
+          const cartItem = document.createElement('div');
+          cartItem.className = 'cart-item';
+          cartItem.innerHTML = `
+            <img src="${item.image}" alt="${item.title}">
+            <div class="cart-item-details">
+              <div class="cart-item-title">${item.title}</div>
+              <div class="cart-item-price">${item.price}</div>
+            </div>
+            <div class="remove-item" onclick="removeFromCart(${index})">&times;</div>
+          `;
+          cartItems.appendChild(cartItem);
+        });
+      }
+      
+      // Update total
+      const total = cart.reduce((sum, item) => {
+        const price = parseInt(item.price.replace(/[^0-9]/g, ''));
+        return sum + price;
+      }, 0);
+      cartTotal.textContent = `₹${total}`;
+    }
+    
+    // Function to remove item from cart
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      updateCart();
+    }
+    
+    // Function to toggle cart modal
+    function toggleCart() {
+      const cartModal = document.getElementById('cartModal');
+      cartModal.classList.toggle('open');
+    }
+    
+    // Function to open checkout modal
+    function openCheckout() {
+      if (cart.length === 0) {
+        alert('Your cart is empty!');
+        return;
+      }
+      closeModal('cartModal');
+      document.getElementById('checkoutModal').style.display = 'flex';
+    }
+    
+    // Function to process payment
+    function processPayment() {
+      // Validate form
+      const form = document.getElementById('checkoutForm');
+      const inputs = form.querySelectorAll('input[required]');
+      let valid = true;
+      
+      inputs.forEach(input => {
+        if (!input.value) {
+          valid = false;
+          input.style.borderColor = 'red';
+        } else {
+          input.style.borderColor = '';
+        }
+      });
+      
+      if (!valid) {
+        alert('Please fill all required fields');
+        return;
+      }
+      
+      // Process payment
+      const total = cart.reduce((sum, item) => {
+        const price = parseInt(item.price.replace(/[^0-9]/g, ''));
+        return sum + price;
+      }, 0);
+      
+      // Show success message
+      document.getElementById('checkoutModal').style.display = 'none';
+      document.getElementById('txnIdText').textContent = `Transaction ID: DEMO${Math.floor(100000 + Math.random() * 900000)}`;
+      document.getElementById('paymentPopup').style.display = 'flex';
+      
+      // Clear cart
+      cart = [];
+      updateCart();
+    }
+    
+    // Function to close modal
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = 'none';
+      if (modalId === 'cartModal') {
+        document.getElementById('cartModal').classList.remove('open');
+      }
+    }
+    
+    // Close modal when clicking outside content
+    window.onclick = function(event) {
+      if (event.target.classList.contains('modal')) {
+        event.target.style.display = 'none';
+      }
+    }
+
+    // Initialize cart
+    updateCart();
+  </script>
+
+  <!-- The rest of your existing JavaScript code would go here -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+  <script>
+    // ✅ Supabase Config
+    const SUPABASE_URL = "https://wfmmdcyxxqzuxgglktso.supabase.co";
+    const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhbmFzZSIsInJlZiI6IndmbW1kY3l4eHF6dXhnZ2xrdHNvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTcxODg5NjksImV4cCI6MjA3Mjc2NDk2OX0.auqeBySj3AFATopmXIi5DxwD7OEF_MVi1A-XaWAgQlk";
+    const { createClient } = supabase;
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Plans Data
+    const plans = [
+      { name: "Basic Plan", price: "₹499 / month", desc: "1 toy at a time." },
+      { name: "Family Plan", price: "₹999 / month", desc: "3 toys at a time." },
+      { name: "Premium Plan", price: "₹1499 / month", desc: "Unlimited swaps." },
+      { name: "Pay per Toy", price: "₹199 / day", desc: "Swap anytime." }
+    ];
+
+    // Load Plans
+    const planList = document.getElementById("plan-list");
+    plans.forEach(plan => {
+      planList.innerHTML += `
+        <div class="card">
+          <h3>${plan.name}</h3>
+          <p><strong>${plan.price}</strong></p>
+          <p>${plan.desc}</p>
+        </div>`;
+    });
+
+    // Auth Form Functions
+    function showAuthForm(isSignUp = false) {
+      const authContainer = document.getElementById('authContainer');
+      const authBox = document.getElementById('authBox');
+      
+      authContainer.classList.add('show');
+      
+      if (isSignUp) {
+        authBox.classList.add('right-panel-active');
+      } else {
+        authBox.classList.remove('right-panel-active');
+      }
+    }
+    
+    function hideAuthForm() {
+      document.getElementById('authContainer').classList.remove('show');
+    }
+
+    // ✅ Supabase Signup
+    async function signupUser() {
+      const name = document.getElementById("signupName").value;
+      const email = document.getElementById("signupEmail").value;
+      const password = document.getElementById("signupPassword").value;
+
+      const { data, error } = await supabaseClient.auth.signUp({
+        email: email,
+        password: password,
+        options: { data: { full_name: name } }
+      });
+
+      if (error) {
+        alert("Signup Error: " + error.message);
+      } else {
+        alert("Signup successful! Please check your email to confirm.");
+        hideAuthForm();
+      }
+    }
+
+    // ✅ Supabase Login
+    async function loginUser() {
+      const email = document.getElementById("loginEmail").value;
+      const password = document.getElementById("loginPassword").value;
+
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email: email,
+        password: password
+      });
+
+      if (error) {
+        alert("Login Error: " + error.message);
+      } else {
+        alert("Welcome back " + email);
+        hideAuthForm();
+      }
+    }
+
+    // ✅ Hero Slideshow
+    (function startHeroSlideshow(){
+      const hero = document.querySelector(".hero");
+      const images = [
+        "https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?q=80",
+        "https://images.unsplash.com/photo-1527061011665-3652c757a4d3?q=80",
+        "https://images.unsplash.com/photo-1519681393784-d120267933ba?q=80",
+        "https://images.unsplash.com/photo-1595550903979-1969e5adeb92?q=80",
+        "https://images.unsplash.com/photo-1558060370-d644479cb6f7?q=80&w=1228&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1500995617113-cf789362a3e1?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1530325553241-4f6e7690cf36?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1587654780291-39c9404d746b?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1599623560574-39d485900c95?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D",
+        "https://images.unsplash.com/photo-1596461404969-9ae70f2830c1?q=80&w=1470&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D"
+      ];
+      const slideA = document.createElement("div");
+      const slideB = document.createElement("div");
+      slideA.className = "slide active";
+      slideB.className = "slide";
+      hero.appendChild(slideA);
+      hero.appendChild(slideB);
+      let i = 0, showA = true;
+      slideA.style.backgroundImage = `url('${images[0]}')`;
+      slideB.style.backgroundImage = `url('${images[1]}')`;
+      setInterval(() => {
+        i = (i + 1) % images.length;
+        if (showA) {
+          slideB.style.backgroundImage = `url('${images[i]}')`;
+          slideB.classList.add("active");
+          slideA.classList.remove("active");
+        } else {
+          slideA.style.backgroundImage = `url('${images[i]}')`;
+          slideA.classList.add("active");
+          slideB.classList.remove("active");
+        }
+        showA = !showA;
+      }, 5000);
+    })();
+
+    // -----------------------------
+    // Demo Payment Logic (prototype)
+    // -----------------------------
+    (function setupDemoPayment(){
+      const payBtn = document.getElementById("payBtn");
+      const popup = document.getElementById("paymentPopup");
+      const closePopupBtn = document.getElementById("closePopupBtn");
+      const txnText = document.getElementById("txnIdText");
+
+      if (!payBtn || !popup) return; // safety
+
+      // Generate a random demo transaction ID
+      function generateDemoTx() {
+        const random = Math.floor(Math.random() * 900000) + 100000; // 6-digit
+        const timePart = Date.now().toString().slice(-5);
+        return `DEMO${random}${timePart}`;
+      }
+
+      payBtn.addEventListener("click", () => {
+        const txn = generateDemoTx();
+        txnText.textContent = `Transaction ID: ${txn}`;
+        popup.style.display = "flex";
+      });
+
+      closePopupBtn.addEventListener("click", () => {
+        popup.style.display = "none";
+      });
+
+      // close popup if clicked outside content
+      popup.addEventListener("click", (e) => {
+        if (e.target === popup) popup.style.display = "none";
+      });
+    })();
+  </script>
+</body>
+</html>
